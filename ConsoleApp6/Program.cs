@@ -65,26 +65,33 @@ class Program
 
     private static void SolveEquation(Dictionary<char, int?> variables)
     {
-        var a = variables['a'].Value;
-        var b = variables['b'].Value;
-        var c = variables['c'].Value;
+        try
+        {
+            var a = variables['a'].Value;
+            var b = variables['b'].Value;
+            var c = variables['c'].Value;
 
-        var discriminant = (int)Math.Pow(b, 2) - 4 * a * c;
+            var discriminant = (int)Math.Pow(b, 2) - 4 * a * c;
 
-        if (discriminant > 0)
-        {
-            var x1 = (-b + (int)Math.Sqrt(discriminant)) / (2 * a);
-            var x2 = (-b - (int)Math.Sqrt(discriminant)) / (2 * a);
-            Console.WriteLine($"x1 = {x1}, x2 = {x2}");
+            if (discriminant > 0)
+            {
+                var x1 = (-b + (int)Math.Sqrt(discriminant)) / (2 * a);
+                var x2 = (-b - (int)Math.Sqrt(discriminant)) / (2 * a);
+                Console.WriteLine($"x1 = {x1}, x2 = {x2}");
+            }
+            else if (discriminant == 0)
+            {
+                var x = -b / (2 * a);
+                Console.WriteLine($"x = {x}");
+            }
+            else
+            {
+                throw new NoRootsException(discriminant);
+            }
         }
-        else if (discriminant == 0)
+        catch (Exception e)
         {
-            var x = -b / (2 * a);
-            Console.WriteLine($"x = {x}");
-        }
-        else
-        {
-            throw new NoRootsException(discriminant);
+            throw new Exception("An error in calculations of the equation.", e);
         }
     }
 
@@ -106,25 +113,26 @@ class Program
         }
         catch (Exception e)
         {
+            var customFormatException = new Exception($"Cannot parse the variable \"{input}\".", e);
+
             foreach (var pair in variables)
             {
                 if (pair.Key == variable)
                 {
-                    e.Data[pair.Key] = $"{input} <- This value must be a number.";
+                    customFormatException.Data[pair.Key] = $"{input} <- This value must be a number.";
                     continue;
                 }
 
                 if (pair.Value == null)
                 {
-                    e.Data[pair.Key] = "?";
+                    customFormatException.Data[pair.Key] = "?";
                     continue;
                 }
-                
-                e.Data[pair.Key] = pair.Value;
+
+                customFormatException.Data[pair.Key] = pair.Value;
             }
-            FormatData(e.Message, Severity.Error, e.Data);
-            result = null;
-            return false;
+
+            throw customFormatException;
         }
     }
 
