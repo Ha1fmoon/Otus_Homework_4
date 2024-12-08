@@ -2,6 +2,7 @@
 
 public enum Severity
 {
+    Notification,
     Warning,
     Error
 }
