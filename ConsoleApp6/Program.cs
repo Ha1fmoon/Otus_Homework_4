@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Text;
 
 namespace ConsoleApp6;
 
@@ -127,32 +126,31 @@ class Program
             var b = variables['b'].Value;
             var c = variables['c'].Value;
 
-            var discriminant = (int)Math.Pow(b, 2) - 4 * a * c;
-
-            if (discriminant > 0)
+            var discriminant = Math.Pow(b, 2) - 4 * a * c;
+            
+            var x = (-b + SquareRoot(discriminant)) / (2 * a);
+                
+            if (discriminant == 0)
             {
-                var x1 = (-b + (int)Math.Sqrt(discriminant)) / (2 * a);
-                var x2 = (-b - (int)Math.Sqrt(discriminant)) / (2 * a);
-                Console.WriteLine($"x1 = {x1}, x2 = {x2}");
-            }
-            else if (discriminant == 0)
-            {
-                var x = -b / (2 * a);
                 Console.WriteLine($"x = {x}");
             }
             else
             {
-                throw new NoRootsException(discriminant);
+                var x2 = (-b - SquareRoot(discriminant)) / (2 * a);
+                Console.WriteLine($"x1 = {x}, x2 = {x2}");
             }
-        }
-        catch (NoRootsException)
-        {
-            throw;
         }
         catch (Exception e)
         {
-            throw new Exception("An error in calculations of the equation.", e);
+            throw new NoRootsException("No real values found");
         }
+    }
+    
+    private static double SquareRoot(double value)
+    {
+        if (value < 0) throw new Exception("Cannot square root a negative number");
+
+        return Math.Sqrt(value);
     }
 
     private static bool ValidateEquationInput(string input, char variable, Dictionary<char, int?> variables, out int? result)
